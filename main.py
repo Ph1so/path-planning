@@ -1,5 +1,8 @@
 import json
 import copy
+import math
+from dataclasses import dataclass
+from typing import TypeAlias
 
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
@@ -14,7 +17,7 @@ ox.settings.cache_folder = './cache'
 address = "Cary Memorial Library, 1874 Massachusetts Ave, Lexington, MA 02420"
 
 try:
-    G = ox.graph_from_address(address, dist=800, network_type="walk")
+    G = ox.graph_from_address(address, dist=800, network_type="drive")
     start_node = ox.distance.nearest_nodes(G, X=-71.2299, Y=42.4479)
     print(start_node)
     end_node = ox.distance.nearest_nodes(G, X=-71.2328, Y=42.4429)
@@ -23,9 +26,10 @@ try:
     node_sizes = [100 if node == start_node or node == end_node  else 15 for node in G.nodes()]
 
     adj_dict = {
-        str(u): {str(v): d[0]['length'] for v, d in nbrs.items()}
+        int(u): {str(v): round(float(d[0]['length']), 2) for v, d in nbrs.items()}
         for u, nbrs in G.adj.items()
     }
+
     fig, ax = ox.plot_graph(
         G, 
         node_color=node_colors, 
